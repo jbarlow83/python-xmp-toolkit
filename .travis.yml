@@ -79,7 +79,8 @@ before_install:
     fi
     PYTHON_CMD=python$PYTHON
   elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
-    brew install exempi python3
+    brew upgrade python
+    brew install exempi
     PYTHON_CMD=python3
   fi
   $PYTHON_CMD -m pip install --upgrade pip wheel
