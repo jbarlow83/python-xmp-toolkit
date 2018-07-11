@@ -4,9 +4,9 @@ Installation
 Requirements
 ------------
 
- * Python 2.6, 2.7, 3.3, 3.4, 3.5, or 3.6
+ * Python 2.7, 3.4, 3.5, 3.6, or 3.7
  * Exempi 2.2.0+
- * Linux or OS X (see notes below for Windows)
+ * Linux or macOS (see notes below for Windows)
 
 
 Python XMP Toolkit
@@ -26,7 +26,7 @@ Exempi
 ------
 Python XMP Toolkit requires Exempi 2.2.0 or higher which can be downloaded from
 http://libopenraw.freedesktop.org/wiki/Exempi.  It is probably already
-installed if you are working on linux.
+installed if you are working on Linux.
 
 To install Exempi, unpack the distribution and run::
 
@@ -40,8 +40,8 @@ systems package manager, e.g.::
     sudo apt-get install libexempi3  # (Ubuntu/Debian)
     brew install exempi  # (Homebrew on OS X)
 
-Mac OS X
---------
+macOS
+-----
 Note Exempi requires boost (http://www.boost.org/) to compile, so on OS
 X you probably need to run configure with one of the following options::
 

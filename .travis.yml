@@ -1,12 +1,14 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
-  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7-dev"
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libexempi3
+addons:
+  apt:
+    update: true
 
 # command to install dependencies
 install:
@@ -17,10 +19,10 @@ install:
 script:
   - coverage run setup.py test
 
-after_success:
-  - coveralls
+# after_success:
+#   - coveralls
 
-notifications:
-  email:
-    - "john.g.evans.ne@gmail.com"
-    - "lars@hankat.dk"
+# notifications:
+#   email:
+#     - "john.g.evans.ne@gmail.com"
+#     - "lars@hankat.dk"
