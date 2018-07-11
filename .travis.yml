@@ -1,14 +1,89 @@
 language: python
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "3.7-dev"
+dist: trusty
+sudo: false
 
-addons:
-  apt:
-    update: true
+env:
+  global:
+    EXEMPI_RELEASE=https://libopenraw.freedesktop.org/download/exempi-2.3.0.tar.bz2
+
+matrix:
+  include:
+  - os: linux
+    python: "2.7"
+    addons: &exempi3
+      apt:
+        update: true
+        packages: [libexempi3]
+
+  - os: linux
+    python: "3.4"
+    addons: *exempi3
+
+  - os: linux
+    python: "3.5"
+    addons: *exempi3
+
+  - os: linux
+    python: "3.6"
+    addons: *exempi3
+
+  - os: linux
+    python: "3.7-dev"
+    addons: *exempi3
+
+  - os: osx
+    osx_image: xcode8.3
+    language: generic
+
+  - stage: wheels
+    os: osx
+    osx_image: xcode8.3
+    language: cpp  # osx + language: python is broken
+    install:
+      - $PYTHON_CMD -m pip install cibuildwheel==0.9.1
+    script:
+      - $PYTHON_CMD setup.py sdist -d wheelhouse
+      - export CIBW_SKIP="cp27*"
+      - cibuildwheel --output-dir wheelhouse
+      - |
+        if [[ $TRAVIS_TAG ]]; then
+          $PYTHON_CMD -m pip install twine
+          $PYTHON_CMD -m twine upload wheelhouse/*.whl wheelhouse/*.tar.gz
+        fi
+
+  - stage: wheels
+    os: linux
+    python: "3.6"  # only need one environment to build all linux wheels
+    sudo: required
+    services:
+      - docker
+    install:
+      - $PYTHON_CMD -m pip install cibuildwheel==0.9.1
+    script:
+      - mkdir exempi && wget --no-check-certificate -q $EXEMPI_RELEASE -O - | tar jx -C exempi --strip-components=1
+      - export CIBW_BEFORE_BUILD='yum update && yum install -y expat-devel zlib-devel boost-devel && cd exempi && ./configure && make install && cd ..'
+      - cibuildwheel --output-dir wheelhouse
+      - |
+        if [[ $TRAVIS_TAG ]]; then
+          $PYTHON_CMD -m pip install twine
+          $PYTHON_CMD -m twine upload wheelhouse/*.whl
+        fi
+
+before_install:
+- |
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    if [ "$PYTHON" == "3.5" ]; then
+      python$PYTHON -m ensurepip
+    elif [ "$PYTHON" = "3.6" ]; then
+      pyenv global system $PYTHON # https://github.com/travis-ci/travis-ci/issues/8363
+    fi
+    PYTHON_CMD=python$PYTHON
+  elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
+    brew update -q
+    brew install exempi3
+    PYTHON_CMD=python3
+  fi
+  $PYTHON_CMD -m pip install --upgrade pip wheel
 
 # command to install dependencies
 install:
@@ -26,3 +101,7 @@ script:
 #   email:
 #     - "john.g.evans.ne@gmail.com"
 #     - "lars@hankat.dk"
+
+stages:
+  - test
+  - wheels
