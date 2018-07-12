@@ -87,8 +87,8 @@ before_install:
 
 # command to install dependencies
 install:
-  - pip install coveralls
-  - pip install .
+  - $PYTHON_CMD -m pip install coveralls
+  - $PYTHON_CMD -m pip install .
 
 # command to run tests
 script:
